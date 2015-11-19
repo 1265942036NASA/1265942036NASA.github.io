@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+              <html>
+              <head>
+                  <title>Pushing Box Game!</title>
+              </head>
+              <h1>Let's push the boxes together!</h1>
+              <body>
+                  <canvas id="canvas" width="520" height="520"></canvas>
+                  <script src="https://code.jquery.com/jquery-2.1.0.js"></script>
+<script>
+
+//greeting;
+var name=prompt("What's your name?");
+console.log("Hello,"+name);
+
+// Set up canvas;
+var canvas = document.getElementById("canvas"); 
+var ctx = canvas.getContext("2d");
+var image = new Image();
+image.src = "http://cliparts.co/cliparts/pcq/Kdd/pcqKdd7ni.png";
+
+// Get the width and height from the canvas element;
+var width = canvas.width; 
+var height = canvas.height;
+var borderWidth=10;
+var blockSize = 50;
+var step=0;
+
+// draw instructions on the bottom;
+var drawInstructions = function () {
+ctx.font = "20px Courier";
+ctx.fillStyle = "Red";
+ctx.textAlign = "left";
+ctx.textBaseline = "bottom";
+ctx.fillText("use w, a, s, d, to control the direction;", borderWidth, height-3*borderWidth);
+ctx.fillText("n: next game; b: last game; r: to restart.", borderWidth, height-borderWidth);
+ctx.fillText("level "+(i+1), 8*blockSize, blockSize);
+};
+
+// Draw the border(gray);
+var drawBorder = function () {
+ctx.fillStyle = "Gray";
+ctx.fillRect(0, 0, width, borderWidth);
+ctx.fillRect(0, height - borderWidth, width, borderWidth); 
+ctx.fillRect(0, 0, borderWidth, height); 
+ctx.fillRect(width - borderWidth, 0, borderWidth, height);
+};
+
+// set the function to draw a square;
+var square = function (x,y,long,wide,colour) { ctx.beginPath();
+ctx.fillStyle = colour;
+ctx.fillRect(x,y,long,wide); 
+};
+
+// set the function to draw a circle;
+var circle = function (x, y, radius, fillCircle, colour) { ctx.beginPath();
+ctx.arc(x+blockSize/2, y+blockSize/2, blockSize/4, 0, Math.PI * 2, false);
+ctx.fillStyle = colour;
+if (fillCircle) {
+ctx.fill(); } else {
+ctx.stroke(); }
+};
+
+/* The map constructor(
+divide this canvas into 10X10 pixels;
+use a loop and two coordinates:
+ if "9", draw nothing;
+ if "0", set a wall;i f "3", set a man;
+ if "1", set a target; if "2", set a box;
+ if "4", target+box; if "4", target+man;
+)*/
+var Map = function(map){
+targetLeft=0;
+targetAchieved=0;
+manInTarget=0;
+for (var y=0; y<10; y++){
+for (var x=0; x<10; x++){
+if (map[y][x] === 0){
+square(borderWidth+x*blockSize, borderWidth+y*blockSize, blockSize, blockSize, "Gray");
+}
+else if (map[y][x] === 1){
+circle(borderWidth+x*blockSize, borderWidth+y*blockSize, blockSize, true, "Green")
+targetLeft++;
+}
+else if (map[y][x] === 2){
+square(borderWidth+x*blockSize, borderWidth+y*blockSize, blockSize, blockSize, "Orange");
+}
+else if (map[y][x] === 3){
+ctx.drawImage(image,borderWidth+x*blockSize,borderWidth+y*blockSize,blockSize,blockSize);
+}
+else if (map[y][x] === 4){
+square(borderWidth+x*blockSize, borderWidth+y*blockSize, blockSize, blockSize, "Green")
+targetAchieved++;
+}
+else if (map[y][x] === 5){
+square(borderWidth+x*blockSize, borderWidth+y*blockSize, blockSize, blockSize, "Green")
+ctx.drawImage(image,borderWidth+x*blockSize+1,borderWidth+y*blockSize+1,blockSize-2,blockSize-2);
+manInTarget++;
+}
+}}
+};
+
+// set the movement function;
+var movement=function(direction){
+for (var Y=0; Y<10; Y++){
+for (var X=0; X<10; X++){
+if (map[Y][X]===3&&map[Y-1][X]===9&&direction==="up"){
+map[Y][X]=9;
+map[Y-1][X]=3;
+step++;
+console.log("UP; "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y+1][X]===9&&direction==="down"){
+map[Y][X]=9;
+map[Y+1][X]=3;
+step++;
+console.log("DOWN, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y][X-1]===9&&direction==="left"){
+map[Y][X]=9;
+map[Y][X-1]=3;
+step++;
+console.log("LEFT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y][X+1]===9&&direction==="right"){
+map[Y][X]=9;
+map[Y][X+1]=3;
+step++;
+console.log("RIGHT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+
+
+if (map[Y][X]===3&&map[Y-1][X]===2&&map[Y-2][X]===9&&direction==="up"){
+map[Y][X]=9;
+map[Y-1][X]=3;
+map[Y-2][X]=2;
+step++;
+console.log("UP; "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y+1][X]===2&&map[Y+2][X]===9&&direction==="down"){
+map[Y][X]=9;
+map[Y+1][X]=3;
+map[Y+2][X]=2;
+step++;
+console.log("DOWN, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y][X-1]===2&&map[Y][X-2]===9&&direction==="left"){
+map[Y][X]=9;
+map[Y][X-1]=3;
+map[Y][X-2]=2;
+step++;
+console.log("LEFT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y][X+1]===2&&map[Y][X+2]===9&&direction==="right"){
+map[Y][X]=9;
+map[Y][X+1]=3;
+map[Y][X+2]=2;
+step++;
+console.log("RIGHT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+
+
+if (map[Y][X]===3&&map[Y-1][X]===2&&map[Y-2][X]===1&&direction==="up"){
+map[Y][X]=9;
+map[Y-1][X]=3;
+map[Y-2][X]=4;
+step++;
+console.log("UP; "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y+1][X]===2&&map[Y+2][X]===1&&direction==="down"){
+map[Y][X]=9;
+map[Y+1][X]=3;
+map[Y+2][X]=4;
+step++;
+console.log("DOWN, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y][X-1]===2&&map[Y][X-2]===1&&direction==="left"){
+map[Y][X]=9;
+map[Y][X-1]=3;
+map[Y][X-2]=4;
+step++;
+console.log("LEFT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y][X+1]===2&&map[Y][X+2]===1&&direction==="right"){
+map[Y][X]=9;
+map[Y][X+1]=3;
+map[Y][X+2]=4;
+step++;
+console.log("RIGHT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+
+
+if (map[Y][X]===3&&map[Y-1][X]===1&&direction==="up"){
+map[Y][X]=9;
+map[Y-1][X]=5;
+step++;
+console.log("UP; "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y+1][X]===1&&direction==="down"){
+map[Y][X]=9;
+map[Y+1][X]=5;
+step++;
+console.log("DOWN, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y][X-1]===1&&direction==="left"){
+map[Y][X]=9;
+map[Y][X-1]=5;
+step++;
+console.log("LEFT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y][X+1]===1&&direction==="right"){
+map[Y][X]=9;
+map[Y][X+1]=5;
+step++;
+console.log("RIGHT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+
+
+if (map[Y][X]===5&&map[Y-1][X]===9&&direction==="up"){
+map[Y][X]=1;
+map[Y-1][X]=3;
+step++;
+console.log("UP; "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y+1][X]===9&&direction==="down"){
+map[Y][X]=1;
+map[Y+1][X]=3;
+step++;
+console.log("DOWN, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y][X-1]===9&&direction==="left"){
+map[Y][X]=1;
+map[Y][X-1]=3;
+step++;
+console.log("LEFT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y][X+1]===9&&direction==="right"){
+map[Y][X]=1;
+map[Y][X+1]=3;
+step++;
+console.log("RIGHT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+
+
+if (map[Y][X]===3&&map[Y-1][X]===4&&map[Y-2][X]===9&&direction==="up"){
+map[Y][X]=9;
+map[Y-1][X]=5;
+map[Y-2][X]=2;
+step++;
+console.log("UP; "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y+1][X]===4&&map[Y+2][X]===9&&direction==="down"){
+map[Y][X]=9;
+map[Y+1][X]=5;
+map[Y+2][X]=2;
+step++;
+console.log("DOWN, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y][X-1]===4&&map[Y][X-2]===9&&direction==="left"){
+map[Y][X]=9;
+map[Y][X-1]=5;
+map[Y][X-2]=2;
+step++;
+console.log("LEFT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y][X+1]===4&&map[Y][X+2]===9&&direction==="right"){
+map[Y][X]=9;
+map[Y][X+1]=5;
+map[Y][X+2]=2;
+step++;
+console.log("RIGHT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+
+
+if (map[Y][X]===3&&map[Y-1][X]===4&&map[Y-2][X]===1&&direction==="up"){
+map[Y][X]=9;
+map[Y-1][X]=5;
+map[Y-2][X]=4;
+step++;
+console.log("UP; "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y+1][X]===4&&map[Y+2][X]===1&&direction==="down"){
+map[Y][X]=9;
+map[Y+1][X]=5;
+map[Y+2][X]=4;
+step++;
+console.log("DOWN, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y][X-1]===4&&map[Y][X-2]===1&&direction==="left"){
+map[Y][X]=9;
+map[Y][X-1]=5;
+map[Y][X-2]=4;
+step++;
+console.log("LEFT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===3&&map[Y][X+1]===4&&map[Y][X+2]===1&&direction==="right"){
+map[Y][X]=9;
+map[Y][X+1]=5;
+map[Y][X+2]=4;
+step++;
+console.log("RIGHT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+
+
+if (map[Y][X]===5&&map[Y-1][X]===2&&map[Y-2][X]===9&&direction==="up"){
+map[Y][X]=1;
+map[Y-1][X]=3;
+map[Y-2][X]=2;
+step++;
+console.log("UP; "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y+1][X]===2&&map[Y+2][X]===9&&direction==="down"){
+map[Y][X]=1;
+map[Y+1][X]=3;
+map[Y+2][X]=2;
+step++;
+console.log("DOWN, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y][X-1]===2&&map[Y][X-2]===9&&direction==="left"){
+map[Y][X]=1;
+map[Y][X-1]=3;
+map[Y][X-2]=2;
+step++;
+console.log("LEFT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y][X+1]===2&&map[Y][X+2]===9&&direction==="right"){
+map[Y][X]=1;
+map[Y][X+1]=3;
+map[Y][X+2]=2;
+step++;
+console.log("RIGHT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+
+
+if (map[Y][X]===5&&map[Y-1][X]===4&&map[Y-2][X]===9&&direction==="up"){
+map[Y][X]=1;
+map[Y-1][X]=5;
+map[Y-2][X]=2;
+step++;
+console.log("UP; "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y+1][X]===4&&map[Y+2][X]===9&&direction==="down"){
+map[Y][X]=1;
+map[Y+1][X]=5;
+map[Y+2][X]=2;
+step++;
+console.log("DOWN, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y][X-1]===4&&map[Y][X-2]===9&&direction==="left"){
+map[Y][X]=1;
+map[Y][X-1]=5;
+map[Y][X-2]=2;
+step++;
+console.log("LEFT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y][X+1]===4&&map[Y][X+2]===9&&direction==="right"){
+map[Y][X]=1;
+map[Y][X+1]=5;
+map[Y][X+2]=2;
+step++;
+console.log("RIGHT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+
+
+if (map[Y][X]===5&&map[Y-1][X]===4&&map[Y-2][X]===1&&direction==="up"){
+map[Y][X]=1;
+map[Y-1][X]=5;
+map[Y-2][X]=4;
+step++;
+console.log("UP; "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y+1][X]===4&&map[Y+2][X]===1&&direction==="down"){
+map[Y][X]=1;
+map[Y+1][X]=5;
+map[Y+2][X]=4;
+step++;
+console.log("DOWN, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y][X-1]===4&&map[Y][X-2]===1&&direction==="left"){
+map[Y][X]=1;
+map[Y][X-1]=5;
+map[Y][X-2]=4;
+step++;
+console.log("LEFT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y][X+1]===4&&map[Y][X+2]===1&&direction==="right"){
+map[Y][X]=1;
+map[Y][X+1]=5;
+map[Y][X+2]=4;
+step++;
+console.log("RIGHT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+
+
+if (map[Y][X]===5&&map[Y-1][X]===2&&map[Y-2][X]===1&&direction==="up"){
+map[Y][X]=1;
+map[Y-1][X]=3;
+map[Y-2][X]=4;
+step++;
+console.log("UP; "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y+1][X]===2&&map[Y+2][X]===1&&direction==="down"){
+map[Y][X]=1;
+map[Y+1][X]=3;
+map[Y+2][X]=4;
+step++;
+console.log("DOWN, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y][X-1]===2&&map[Y][X-2]===1&&direction==="left"){
+map[Y][X]=1;
+map[Y][X-1]=3;
+map[Y][X-2]=4;
+step++;
+console.log("LEFT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y][X+1]===2&&map[Y][X+2]===1&&direction==="right"){
+map[Y][X]=1;
+map[Y][X+1]=3;
+map[Y][X+2]=4;
+step++;
+console.log("RIGHT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+
+
+if (map[Y][X]===5&&map[Y-1][X]===1&&direction==="up"){
+map[Y][X]=1;
+map[Y-1][X]=5;
+step++;
+console.log("UP; "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y+1][X]===1&&direction==="down"){
+map[Y][X]=1;
+map[Y+1][X]=5;
+step++;
+console.log("DOWN, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y][X-1]===1&&direction==="left"){
+map[Y][X]=1;
+map[Y][X-1]=5;
+step++;
+console.log("LEFT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+if (map[Y][X]===5&&map[Y][X+1]===1&&direction==="right"){
+map[Y][X]=1;
+map[Y][X+1]=5;
+step++;
+console.log("RIGHT, "+"Now you have used "+step+" steps.");
+direction=0;
+}
+}}
+};
+
+// Convert keycodes to directions
+var directions = { 
+65: "left",
+87: "up", 
+68: "right", 
+83: "down",
+78: "next",
+66: "back",
+82: "restart"
+};
+
+// settings of maps (use an array);
+var mapList=[
+[
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,1,0,0,0,0,0,0],
+[0,0,0,9,0,0,0,0,0,0],
+[0,0,0,9,0,0,0,0,0,0],
+[0,0,0,2,3,2,9,1,0,0],
+[1,9,9,2,2,0,0,0,0,0],
+[0,0,0,0,9,0,0,0,0,0],
+[0,0,0,0,9,0,0,0,0,0],
+[0,0,0,0,1,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0]
+],
+[
+[0,0,0,0,0,0,0,0,0,0],
+[0,9,3,9,0,0,0,0,0,0],
+[0,9,2,9,0,0,0,0,0,0],
+[0,9,2,2,0,0,0,1,0,0],
+[0,0,0,9,0,0,0,1,0,0],
+[0,0,0,9,9,9,9,1,0,0],
+[0,0,9,9,9,0,9,9,0,0],
+[0,0,9,9,9,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0]
+],
+[
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,9,9,0,0,0,0,0],
+[0,0,3,2,9,0,0,0,0,0],
+[0,0,0,2,9,0,0,0,0,0],
+[0,0,0,9,2,9,0,0,0,0],
+[0,0,1,2,9,9,0,0,0,0],
+[0,0,1,1,4,1,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0]
+],
+[
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,9,3,0,0,0,0,0],
+[0,0,0,9,2,9,9,0,0,0],
+[0,0,0,0,9,0,9,0,0,0],
+[0,0,1,0,9,0,9,9,0,0],
+[0,0,1,2,9,9,0,9,0,0],
+[0,0,1,9,9,9,2,9,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0]
+],
+[
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,9,9,9,9,0,0],
+[0,0,0,0,3,2,2,9,0,0],
+[0,0,9,9,4,1,9,9,0,0],
+[0,0,9,2,1,1,9,0,0,0],
+[0,0,0,0,0,9,9,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0]
+],
+[
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,9,9,3,0,0,0],
+[0,0,9,9,2,1,9,0,0,0],
+[0,0,9,9,1,2,1,9,0,0],
+[0,0,0,0,9,4,2,9,0,0],
+[0,0,0,0,9,9,9,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0]
+],
+[
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,9,9,0,9,3,0],
+[0,0,0,9,9,9,0,9,9,0],
+[0,0,0,2,9,2,9,2,9,0],
+[0,0,0,9,2,0,0,9,9,0],
+[0,0,0,9,2,9,0,9,0,0],
+[0,1,1,1,1,1,9,9,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0]
+],
+[
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,9,9,9,9,0,0],
+[0,0,1,9,2,0,0,9,0,0],
+[0,1,1,2,9,2,9,9,3,0],
+[0,1,1,9,2,9,2,9,0,0],
+[0,0,0,0,0,0,9,9,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0]
+]
+];
+
+// set the win function;
+var win=function(){
+if(targetLeft===0&&manInTarget===0&&targetAchieved!=0){
+ctx.clearRect(0, 0, width, height); 
+ctx.font = "20px Courier";
+ctx.fillStyle = "Red";
+ctx.textAlign = "left";
+ctx.textBaseline = "bottom";
+ctx.fillText("Congratulations "+name+"!", 5*blockSize, blockSize);
+ctx.fillText("You have won level "+(i+1)+" with "+step+" steps!", 2*blockSize, 2*blockSize);
+ctx.fillText("Press n to continue.", 5*blockSize, 3*blockSize);
+step=0;
+}
+}
+
+//set the round function;
+var Round=function(direction){
+if(direction==="next"){
+i=i+1;
+makeUpMap(i);
+basicDrawing();
+}
+else if(direction==="back"&&i>0){
+i=i-1;
+makeUpMap(i);
+basicDrawing();
+}
+else if(direction==="back"&&i===0){
+makeUpMap(i);
+basicDrawing();
+}
+else if(direction==="restart"){
+step=0;
+makeUpMap(i);
+basicDrawing();
+}
+}
+
+// basic drawing function;
+var basicDrawing=function(){
+ctx.clearRect(0, 0, width, height); 
+drawBorder();
+Map(map);
+drawInstructions();
+}
+
+// make up every rounds' map;
+var makeUpMap=function(gamenumber){
+for (var y=0; y<10; y++){
+for (var x=0; x<10; x++){
+map[y][x]=mapList[gamenumber][y][x];
+}}
+};
+
+// basic settings;
+var i=0;
+var direction=0;
+var targetLeft=0;
+var targetAchieved=0;
+var manInTarget=0;
+var map=[
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0]
+];
+makeUpMap(i);
+basicDrawing();
+
+// The keydown handler for handling direction key presses;
+$("body").keydown(function (event) {
+direction = directions[event.keyCode];
+movement(direction);
+Round(direction);
+basicDrawing();
+win();
+});
+
+</script>
+</body>
+</html>
